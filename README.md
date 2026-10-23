@@ -11,7 +11,7 @@
 [![Project Page](https://img.shields.io/badge/Project-Page-4F7F32?style=flat-square)](https://felixstrobel.github.io/transparent-ar-displays/)
 [![Paper](https://img.shields.io/badge/Paper-PDF-C23B2E?style=flat-square)](static/paper.pdf)
 [![DOI](https://img.shields.io/badge/DOI-10.5220%2F0011613200003417-1F5E99?style=flat-square)](https://doi.org/10.5220/0011613200003417)
-[![Video](https://img.shields.io/badge/Video-MP4-17212B?style=flat-square)](https://felixstrobel.github.io/transparent-ar/#video)
+[![Video](https://img.shields.io/badge/Video-MP4-17212B?style=flat-square)](https://felixstrobel.github.io/transparent-ar-displays/#video)
 
 <figure>
   <img src="static/images/teaser.jpg" alt="Conventional (left of each pair) and our transparent (right) AR display in four scenes" width="100%">
