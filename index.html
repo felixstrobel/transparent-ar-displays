@@ -1,0 +1,684 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Improved Directional Guidance with Transparent AR Displays</title>
+
+    <meta name="description" content="A transparent AR display that works on any phone or tablet with a back-facing camera. In a user study (N = 17) it reduced annotation localization error by 61% compared to a conventional AR display. GRAPP 2023, Best Paper Award Honorable Mention." />
+    <meta name="author" content="Felix Strobel, Voicu Popescu" />
+    
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='7' y='3' width='18' height='26' rx='3' fill='none' stroke='%2317212B' stroke-width='2.5'/%3E%3Cpath d='M10 24 L22 8' stroke='%234F7F32' stroke-width='2.5'/%3E%3C/svg%3E" />
+    
+    <!-- Preview metadata -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Improved Directional Guidance with Transparent AR Displays" />
+    <meta property="og:description" content="Making a phone or tablet look like a pane of glass, without head tracking or depth sensing. GRAPP 2023." />
+    <meta property="og:image" content="static/images/teaser.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Google Scholar metadata -->
+    <meta name="citation_title" content="Improved Directional Guidance with Transparent AR Displays" />
+    <meta name="citation_author" content="Strobel, Felix" />
+    <meta name="citation_author" content="Popescu, Voicu" />
+    <meta name="citation_publication_date" content="2023" />
+    <meta name="citation_conference_title" content="Proceedings of the 18th International Joint Conference on Computer Vision, Imaging and Computer Graphics Theory and Applications (VISIGRAPP 2023) - Volume 1: GRAPP" />
+    <meta name="citation_firstpage" content="27" />
+    <meta name="citation_lastpage" content="38" />
+    <meta name="citation_doi" content="10.5220/0011613200003417" />
+    <meta name="citation_pdf_url" content="static/paper.pdf" />
+
+    <!-- Styling -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+
+  <body>
+    <header class="hero">
+      <div class="wrap">
+        <h1>Improved Directional Guidance with Transparent AR Displays</h1>
+        <p class="authors">
+          <a href="https://github.com/felixstrobel">Felix Strobel</a>
+          <sup>1</sup>
+          &ensp;and&ensp;
+          <a href="https://www.cs.purdue.edu/people/faculty/popescu.html">Voicu Popescu</a>
+          <sup>2</sup>
+        </p>
+        <p class="affil">
+          <sup>1</sup>Karlsruhe Institute of Technology&emsp;
+          <sup>2</sup>Purdue University
+        </p>
+        <p class="venue">
+          <span>GRAPP 2023 (VISIGRAPP), Lisbon</span>
+          <span class="award">
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+              <circle
+                cx="8"
+                cy="6"
+                r="4.5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+              />
+              <path
+                d="M5.2 9.5 4 15l4-2 4 2-1.2-5.5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linejoin="round"
+              />
+            </svg>
+            Best Paper Award Honorable Mention
+          </span>
+        </p>
+
+        <nav class="links" aria-label="Paper resources">
+          <a class="btn" href="static/paper.pdf">
+            <svg
+              viewBox="0 0 20 20"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              aria-hidden="true"
+            >
+              <path d="M5 2h7l4 4v12H5z" />
+              <path d="M12 2v4h4" />
+            </svg>
+            Paper
+          </a>
+          <a class="btn" href="#video">
+            <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path d="M6 4v12l10-6z" />
+            </svg>
+            Video
+          </a>
+          <a class="btn" href="https://doi.org/10.5220/0011613200003417">
+            <svg
+              viewBox="0 0 20 20"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              aria-hidden="true"
+            >
+              <path
+                d="M8 12l4-4M7 9l-2 2a3 3 0 0 0 4 4l2-2M13 11l2-2a3 3 0 0 0-4-4L9 7"
+              />
+            </svg>
+            DOI
+          </a>
+          <a class="btn" href="#citation">
+            <svg
+              viewBox="0 0 20 20"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              aria-hidden="true"
+            >
+              <path d="M4 5h12M4 10h12M4 15h7" />
+            </svg>
+            BibTeX
+          </a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <div class="wrap">
+        <div class="viewer" id="viewer" data-mode="conv" data-scene="street">
+          <div class="stage">
+            <div class="photo" id="photo">
+              <img
+                class="conv"
+                id="img-conv"
+                src="static/images/pairs/street-conv.jpg"
+                alt="Conventional AR display: the tablet shows the camera image as is"
+              />
+              <img
+                class="ours"
+                id="img-ours"
+                src="static/images/pairs/street-ours.jpg"
+                alt="Transparent AR display: the tablet shows what the user would see through a transparent plane"
+              />
+            </div>
+            <div>
+              <div class="seg" role="group" aria-label="Display mode">
+                <button type="button" data-mode="conv" aria-pressed="true">
+                  Conventional
+                </button>
+                <button type="button" data-mode="ours" aria-pressed="false">
+                  Transparent (ours)
+                </button>
+              </div>
+              <p class="mode-label" id="mode-label">Conventional AR display</p>
+              <div class="explain" id="explain"></div>
+              <div class="scenes" role="group" aria-label="Scene">
+                <button
+                  type="button"
+                  data-scene="street"
+                  aria-pressed="true"
+                  aria-label="Hotel façade"
+                >
+                  <img src="static/images/pairs/street-ours.jpg" alt="" />
+                </button>
+                <button
+                  type="button"
+                  data-scene="phone"
+                  aria-pressed="false"
+                  aria-label="Phone in front of a monitor"
+                >
+                  <img src="static/images/pairs/phone-ours.jpg" alt="" />
+                </button>
+                <button
+                  type="button"
+                  data-scene="room"
+                  aria-pressed="false"
+                  aria-label="Living room"
+                >
+                  <img src="static/images/pairs/room-ours.jpg" alt="" />
+                </button>
+                <button
+                  type="button"
+                  data-scene="desk"
+                  aria-pressed="false"
+                  aria-label="Cluttered desk"
+                >
+                  <img src="static/images/pairs/desk-ours.jpg" alt="" />
+                </button>
+              </div>
+              <p class="hint">
+                Tip: press <kbd>Space</kbd> to switch between the two displays.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <section id="video" aria-labelledby="video-h">
+        <div class="wrap">
+          <h2 id="video-h">Video</h2>
+          <div class="video-box">
+            <video
+              controls
+              playsinline
+              preload="metadata"
+              poster="static/images/teaser.jpg"
+            >
+              <source
+                src="static/videos/video.mp4"
+                type="video/mp4"
+              />
+              Your browser cannot play this video.
+              <a href="static/videos/video.mp4">Download it instead.</a>
+            </video>
+          </div>
+        </div>
+      </section>
+
+      <section id="abstract" aria-labelledby="abstract-h">
+        <div class="wrap">
+          <h2 id="abstract-h">Abstract</h2>
+          <div class="text">
+            <p>
+              In a popular form of augmented reality (AR), the scene is captured
+              with the back-facing camera of a handheld phone or tablet, and
+              annotations are overlaid onto the live video stream. However, the
+              annotations are not integrated into the user’s field of view, and
+              the user is left with the challenging task of translating the
+              annotations from the display to the real world. This challenge can
+              be alleviated by modifying the video frame to approximate what the
+              user would see in the absence of the display, making the display
+              seem transparent.
+            </p>
+            <p>
+              This paper demonstrates a robust transparent display
+              implementation using only the back-facing camera of a tablet,
+              which was tested extensively over a variety of complex real world
+              scenes. A user study shows that the transparent AR display lets
+              users locate annotations in the real world significantly more
+              accurately than when using a conventional AR display.
+            </p>
+          </div>
+          <div class="findings">
+            <div>
+              <b>No extra hardware</b
+              ><span
+                >Runs on any phone or tablet with a back-facing camera. No head
+                tracking, no depth sensor.</span
+              >
+            </div>
+            <div>
+              <b>Robust in real scenes</b
+              ><span
+                >Works for complex, dynamic, and close-by geometry, from street
+                façades to cluttered desks.</span
+              >
+            </div>
+            <div>
+              <b>61% lower localization error</b
+              ><span
+                >In a within-subjects study with 17 participants (p &lt; 0.0005,
+                Cohen’s d = 3.0).</span
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="method" aria-labelledby="method-h">
+        <div class="wrap">
+          <h2 id="method-h">How it works</h2>
+          <div class="text">
+            <p>
+              A phone shows the world from its camera, which sits in a corner of
+              the device and has a wider field of view than the angle the screen
+              covers in your eyes. The result is the <em>dual-view problem</em>:
+              what you see on the display does not line up with what you see
+              around it. Re-rendering the frame from your viewpoint would fix
+              this, but it normally needs both head tracking and per-pixel
+              depth, and both fail on real scenes such as foliage, water, or
+              anything the camera cannot see.
+            </p>
+            <p>
+              We skip both. We assume the user holds the device in a comfortable
+              default position, the way people naturally hold a phone to take a
+              photo, and we map the camera frame to the user’s view with a
+              single homography. Because a homography is a bijective mapping, it
+              never tears holes into the image the way depth-based reprojection
+              does.
+            </p>
+          </div>
+          <div class="approaches">
+            <div>
+              <h3>Distant geometry assumption</h3>
+              <p>
+                Each display pixel is looked up along the direction of the
+                user’s ray through it. This turns into a simple zoom-in on the
+                camera frame, produces no redundant pixels, and works
+                surprisingly well even for scenes only a few meters away.
+              </p>
+            </div>
+            <div>
+              <h3>Planar proxy approximation</h3>
+              <p>
+                The scene is approximated by a plane, and each pixel is looked
+                up by projecting its intersection with that plane into the
+                camera. This is exact for planar content such as a screen or a
+                poster and is the mode we used in the user study.
+              </p>
+            </div>
+          </div>
+          <figure>
+            <div class="fig-card">
+              <img
+                src="static/images/geometry.jpg"
+                alt="Three geometric diagrams: disocclusion artifacts with per-pixel depth, the distant geometry assumption, and the planar proxy approximation"
+                loading="lazy"
+                width="900"
+                height="450"
+                style="margin-inline: auto"
+              />
+            </div>
+            <figcaption>
+              (a) Even with perfect depth, reprojecting a camera frame to the
+              user viewpoint U leaves holes where the camera C could not see.
+              (b) Distant geometry: pixel p takes its color from the camera
+              along the direction of ray Up. (c) Planar proxy: pixel p takes its
+              color from the projection of proxy point Q′.
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section id="analysis" aria-labelledby="analysis-h">
+        <div class="wrap">
+          <h2 id="analysis-h">Accuracy analysis</h2>
+          <div class="text">
+            <p>
+              We measure transparency error with three quantities: the
+              reprojection error ε (how far a pixel is from where it should be),
+              the share of missing pixels μ, and the share of redundant pixels ρ
+              that the user already sees around the display. In a simulator of a
+              10.5-inch tablet held 50&nbsp;cm from the eye, the distant
+              geometry display beats the conventional one at every scene
+              distance beyond 1&nbsp;m.
+            </p>
+          </div>
+          <div class="two">
+            <figure>
+              <img
+                src="static/images/simulator.jpg"
+                alt="Simulator comparison of conventional display, our display, and ground truth at 2 and 5 meters"
+                loading="lazy"
+                width="893"
+                height="887"
+              />
+              <figcaption>
+                Conventional display, ours, and ground truth at 2&nbsp;m and
+                5&nbsp;m. Insets mark redundant (yellow) and missing (blue)
+                pixels.
+              </figcaption>
+            </figure>
+            <div>
+              <figure style="margin-top: 0">
+                <div class="fig-card">
+                  <img
+                    src="static/images/reprojection-error.jpg"
+                    alt="Plot of average and maximum reprojection error over scene distance for the conventional and our display"
+                    loading="lazy"
+                    width="1200"
+                    height="674"
+                  />
+                </div>
+                <figcaption>Reprojection error over scene distance.</figcaption>
+              </figure>
+              <figure>
+                <div class="fig-card">
+                  <img
+                    src="static/images/missing-redundant.jpg"
+                    alt="Plot of redundant and missing pixel percentages over scene distance"
+                    loading="lazy"
+                    width="1200"
+                    height="667"
+                  />
+                </div>
+                <figcaption>
+                  Redundant and missing pixels over scene distance.
+                </figcaption>
+              </figure>
+            </div>
+          </div>
+          <div class="table-scroll">
+            <table class="numbers">
+              <caption
+                class="sr-only"
+                style="position: absolute; left: -9999px"
+              >
+                Average reprojection error of our display by scene distance
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">Scene distance</th>
+                  <th scope="col">2 m</th>
+                  <th scope="col">3 m</th>
+                  <th scope="col">5 m</th>
+                  <th scope="col">10 m</th>
+                  <th scope="col">20 m</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">Ours, average error</th>
+                  <td class="o">2.4 cm</td>
+                  <td class="o">1.7 cm</td>
+                  <td class="o">1.0 cm</td>
+                  <td class="o">0.54 cm</td>
+                  <td class="o">0.27 cm</td>
+                </tr>
+                <tr>
+                  <th scope="row">Ours, directional error</th>
+                  <td class="o">2.7°</td>
+                  <td class="o">1.9°</td>
+                  <td class="o">1.1°</td>
+                  <td class="o">0.6°</td>
+                  <td class="o">0.3°</td>
+                </tr>
+                <tr>
+                  <th scope="row">Conventional, average error</th>
+                  <td class="c" colspan="5">
+                    over 10 cm (11°) and growing with distance
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="results" aria-labelledby="results-h">
+        <div class="wrap">
+          <h2 id="results-h">Real scenes</h2>
+          <div>
+            <p>
+              Our display keeps the view continuous across the display frame,
+              also when the geometry is close and when objects move. Because it
+              only needs one homography per frame, it runs on low-end devices as
+              well.
+            </p>
+          </div>
+          <figure>
+            <img
+              src="static/images/living-room.jpg"
+              alt="A conventional and our transparent display in an office with a desk less than two meters away"
+              loading="lazy"
+              width="1600"
+              height="900"
+            />
+            <figcaption>
+              Conventional (left) and ours (right). Although the desk is less
+              than 2&nbsp;m away, there is little discontinuity between the
+              display and its surroundings.
+            </figcaption>
+          </figure>
+          <figure>
+            <img
+              src="static/images/dynamic-car.jpg"
+              alt="Three frames of a car passing behind the transparent display"
+              loading="lazy"
+              width="1800"
+              height="477"
+            />
+            <figcaption>
+              A passing car moves from the display into direct view. In the
+              middle frame, the half shown on the display lines up with the half
+              seen directly.
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section id="study" aria-labelledby="study-h">
+        <div class="wrap">
+          <h2 id="study-h">User study</h2>
+          <div class="text">
+            <p>
+              Seventeen participants looked through an Android phone at an image
+              on a laptop screen. The phone briefly marked a point with a dot,
+              and participants then clicked where they believed the dot had
+              been. Each person completed 10 trials with a conventional AR
+              display and 10 with our transparent display, in randomized order.
+            </p>
+            <p>
+              The mean localization error dropped from 23.9&nbsp;px with the
+              conventional display to 9.2&nbsp;px with ours, a 61% reduction
+              (t(16) = 12.38, p &lt; 0.0005, Cohen’s d = 3.0). With the
+              conventional display, people have to memorize landmarks and
+              translate them to the real world. With ours, they simply look in
+              the direction the display points to.
+            </p>
+          </div>
+          <div class="two" style="margin-top: 2rem">
+            <figure>
+              <img
+                src="static/images/study-setup.jpg"
+                alt="Participant holding a phone in front of a laptop, then clicking the remembered location with a mouse"
+                loading="lazy"
+                width="1400"
+                height="793"
+              />
+              <figcaption>
+                Study setup: the annotation is shown through the phone (left),
+                then the participant clicks its location with the mouse (right).
+              </figcaption>
+            </figure>
+            <figure>
+              <div class="fig-card">
+                <img
+                  src="static/images/study-results.jpg"
+                  alt="Box plot and scatter plot of localization errors, showing smaller errors for the transparent display"
+                  loading="lazy"
+                  width="1400"
+                  height="696"
+                />
+              </div>
+              <figcaption>
+                Localization error for the conventional (CC, red) and
+                transparent (EC, green) conditions.
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section id="citation" aria-labelledby="citation-h">
+        <div class="wrap">
+          <div class="bib-head">
+            <h2 id="citation-h">Citation</h2>
+            <button class="btn copy" type="button" id="copy-bib">
+              Copy BibTeX
+            </button>
+          </div>
+          <pre class="bib" id="bibtex">
+@inproceedings{strobel2023transparent,
+  author    = {Strobel, Felix P. and Popescu, Voicu},
+  title     = {Improved Directional Guidance with Transparent AR Displays},
+  booktitle = {Proceedings of the 18th International Joint Conference on Computer Vision,
+               Imaging and Computer Graphics Theory and Applications
+               (VISIGRAPP 2023) - Volume 1: GRAPP},
+  pages     = {27--38},
+  year      = {2023},
+  publisher = {SciTePress},
+  organization = {INSTICC},
+  doi       = {10.5220/0011613200003417},
+  isbn      = {978-989-758-634-7}
+}</pre
+          >
+        </div>
+      </section>
+    </main>
+
+    <script>
+      (function () {
+        const scenes = {
+          street: {
+            conv: "The tablet shows the camera image as is. The hotel façade does not align with the display.",
+            ours: "The frame is remapped to your viewpoint. The display now lines up with the façade around it, so an annotation on the screen points in the true direction of the window.",
+          },
+          phone: {
+            conv: "The phone’s wide-angle camera shows much more than the screen covers in your view. The flower appears twice: once on the display and once right next to it.",
+            ours: "With the planar proxy, the phone shows exactly the part of the monitor that it hides. The flower continues seamlessly across the edge of the phone.",
+          },
+          room: {
+            conv: "The ceiling fan is visible both above the tablet and on it. These redundant pixels create a double-vision effect.",
+            ours: "With the distant geometry assumption, the view stays continuous even though the room is only one to five meters away.",
+          },
+          desk: {
+            conv: "The desk appears smaller and shifted on the display, so objects on the screen do not match their real positions.",
+            ours: "The desk now lines up with its surroundings. The blue area marks parts of the desk that the tablet’s corner camera could not capture.",
+          },
+        };
+        const viewer = document.getElementById("viewer");
+        const imgConv = document.getElementById("img-conv");
+        const imgOurs = document.getElementById("img-ours");
+        const label = document.getElementById("mode-label");
+        const explain = document.getElementById("explain");
+        const modeBtns = viewer.querySelectorAll(".seg button");
+        const sceneBtns = viewer.querySelectorAll(".scenes button");
+
+        function render() {
+          const mode = viewer.dataset.mode,
+            scene = viewer.dataset.scene;
+          modeBtns.forEach((b) =>
+            b.setAttribute("aria-pressed", String(b.dataset.mode === mode)),
+          );
+          sceneBtns.forEach((b) =>
+            b.setAttribute("aria-pressed", String(b.dataset.scene === scene)),
+          );
+          label.textContent =
+            mode === "ours"
+              ? "Transparent AR display (ours)"
+              : "Conventional AR display";
+          explain.textContent = scenes[scene][mode];
+        }
+        function setMode(m) {
+          viewer.dataset.mode = m;
+          render();
+        }
+        function setScene(s) {
+          viewer.dataset.scene = s;
+          imgConv.src = "static/images/pairs/" + s + "-conv.jpg";
+          imgOurs.src = "static/images/pairs/" + s + "-ours.jpg";
+          render();
+        }
+        modeBtns.forEach((b) =>
+          b.addEventListener("click", () => {
+            stopIntro();
+            setMode(b.dataset.mode);
+          }),
+        );
+        sceneBtns.forEach((b) =>
+          b.addEventListener("click", () => {
+            stopIntro();
+            setScene(b.dataset.scene);
+          }),
+        );
+        document.addEventListener("keydown", (e) => {
+          if (e.code !== "Space") return;
+          const t = e.target;
+          if (t.closest && t.closest("button, a, input, textarea, video, pre"))
+            return;
+          e.preventDefault();
+          stopIntro();
+          setMode(viewer.dataset.mode === "ours" ? "conv" : "ours");
+        });
+
+        // Preload all pairs
+        Object.keys(scenes).forEach((s) =>
+          ["conv", "ours"].forEach((m) => {
+            const i = new Image();
+            i.src = "static/images/pairs/" + s + "-" + m + ".jpg";
+          }),
+        );
+
+        // One intro moment: switch to the transparent view once, shortly after load.
+        let intro = null;
+        function stopIntro() {
+          if (intro) {
+            clearTimeout(intro);
+            intro = null;
+          }
+        }
+        const reduce =
+          window.matchMedia &&
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (!reduce)
+          intro = setTimeout(() => {
+            intro = null;
+            setMode("ours");
+          }, 1800);
+        render();
+
+        // Copy BibTeX
+        const copyBtn = document.getElementById("copy-bib");
+        copyBtn.addEventListener("click", async () => {
+          const text = document.getElementById("bibtex").textContent;
+          try {
+            await navigator.clipboard.writeText(text);
+            copyBtn.textContent = "Copied";
+          } catch (err) {
+            const r = document.createRange();
+            r.selectNodeContents(document.getElementById("bibtex"));
+            const s = window.getSelection();
+            s.removeAllRanges();
+            s.addRange(r);
+            copyBtn.textContent = "Selected, press Ctrl+C";
+          }
+          setTimeout(() => {
+            copyBtn.textContent = "Copy BibTeX";
+          }, 2000);
+        });
+      })();
+    </script>
+  </body>
+</html>
